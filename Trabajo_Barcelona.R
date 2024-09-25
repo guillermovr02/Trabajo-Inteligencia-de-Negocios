@@ -104,20 +104,64 @@ Datos_4ºTrimestre <- Datos_4ºTrimestre %>%
 resumen_precio_m2 <- summary(Datos_4ºTrimestre$PrecioPorMetroCuadrado)
 ```
 
-# Limpieza de Datos -------------------------------------------------------
+```{r include=FALSE}
+# Calcular el % de valores NA en cada variable
+# 'sapply' aplica la función 'mean(is.na(x)) * 100' a cada columna del dataframe, 
+# lo que devuelve el porcentaje de valores faltantes (NA) por cada variable (columna).
+sapply(Datos_4ºTrimestre, function(x) mean(is.na(x)) * 100)
 
-sapply(Datos_4ºTrimestre, function(x) sum(is.na(x)))
+# Calcular el porcentaje de NA por fila
+# 'apply' aplica la misma función pero a nivel de filas (indicando '1' como segundo argumento),
+# para obtener el porcentaje de NA en cada observación (fila).
+porcentaje_NA_por_fila <- apply(Datos_4ºTrimestre, 1, function(x) mean(is.na(x)) * 100)
 
-#1.Análisis de valores inconsistentes
-Datos_4ºTrimestre %>% 
-  filter(if_any(everything(), ~ . >= 0))
+# Filtrar las observaciones con más del 20% de valores NA
+# Se filtran las filas que tienen más del 20% de valores NA, seleccionando solo aquellas observaciones 
+# cuyo porcentaje de NA supera el 20%.
+observaciones_con_mas_de_20_NA <- Datos_4ºTrimestre[porcentaje_NA_por_fila > 20, ]
 
-#2.Análisis de valores faltantes
+# Ver las observaciones filtradas
+# Se muestran las observaciones que tienen más del 20% de valores NA.
+observaciones_con_mas_de_20_NA
 
-#Proporción de datos faltantes para cada variable
-miss_var_summary(Datos_4ºTrimestre)
+# Eliminar la columna 'Anio_construccion_anunciante' del dataframe
+# 'select()' elimina la columna especificada del dataframe 'Datos_4ºTrimestre'.
+Datos_4ºTrimestre <- Datos_4ºTrimestre %>% 
+  select(-Anio_construccion_anunciante)
+```
 
+```{r include=FALSE}
+# Convertir la variable 'Barrio' en un factor
+# Esto es útil para trabajar con variables categóricas en análisis y modelos estadísticos.
+Datos_4ºTrimestre$Barrio <- as.factor(Datos_4ºTrimestre$Barrio)
 
+# Convertir la variable 'Distrito' en un factor
+# Esto permite que R trate 'Distrito' como una variable categórica con niveles.
+Datos_4ºTrimestre$Distrito <- as.factor(Datos_4ºTrimestre$Distrito)
 
+# Convertir la variable 'Codigo_Distrito' en un factor
+# Esto asegura que el 'Codigo_Distrito' también sea tratado como una variable categórica.
+Datos_4ºTrimestre$Codigo_Distrito <- as.factor(Datos_4ºTrimestre$Codigo_Distrito)
 
+```
 
+```{r include=FALSE}
+# Precio medio por distrito
+precio_por_distrito <- Datos_4ºTrimestre %>%
+  group_by(Distrito) %>%
+  summarise(
+    PrecioMedio = mean(Precio_de_venta, na.rm = TRUE),
+    PrecioMediano = median(Precio_de_venta, na.rm = TRUE),
+    NumeroViviendas = n()
+  )
+```
+
+```{r}
+# Boxplot de precios por distrito con precios en miles de euros
+ggplot(Datos_4ºTrimestre, aes(x = Distrito, y = Precio_de_venta / 1000)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Distribución de precios por Distrito",
+       x = "Distrito",
+       y = "Precio de venta (miles de euros)")
+```
