@@ -103,17 +103,6 @@ Datos_4ºTrimestre <- Datos_4ºTrimestre %>%
 # Calcular estadísticas descriptivas del precio por metro cuadrado
 resumen_precio_m2 <- summary(Datos_4ºTrimestre$PrecioPorMetroCuadrado)
 ```
-# Analisis Exploratorio ---------------------------------------------------
-
-# Calcular estadísticas descriptivas para el precio y la superficie construida
-resumen_precio <- summary(Datos_4ºTrimestre$`Precio de venta`)
-resumen_superficie <- summary(Datos_4ºTrimestre$`Superficie (m²)`)
-# Calcular el precio por metro cuadrado
-Datos_4ºTrimestre <- Datos_4ºTrimestre %>%
-  mutate(PrecioPorMetroCuadrado = `Precio de venta` / `Superficie (m²)`)
-# Calcular estadísticas descriptivas del precio por metro cuadrado
-resumen_precio_m2 <- summary(Datos_4ºTrimestre$PrecioPorMetroCuadrado)
-
 
 # Limpieza de Datos -------------------------------------------------------
 
